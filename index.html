@@ -12845,6 +12845,8 @@ canvas{display:block;width:100%;height:100%}
 <script>
 window.__progress = window.__progress || { events: [] };
 function prog(ev){ if(window.__progress && window.__progress.events.length < 200) window.__progress.events.push(ev); }
+const play = window.PlayTag || { start() {}, retry() {}, progress() {}, event() {}, end() {} };
+let playHasStarted = false;
 // 仮想画面・レターボックス
 const VW=390, VH=844;
 const canvas=document.getElementById('c');
@@ -12946,6 +12948,7 @@ function spawnLogo(yTop){
 function collectLogo(L){
   if(!L||!L.alive) return;
   L.alive=false; score+=TUNING.LOGO.score; collected++;
+  try { play.progress(); } catch (_) {}
   prog('COLLECT');
   rings.push({x:L.x,y:L.y,t:TUNING.FX.ringTime,max:TUNING.FX.ringTime});
   for(let i=0;i<10;i++){ const a=rand()*6.28,sp=60+rand()*140; parts.push({x:L.x,y:L.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-60,life:.5,max:.5,c: i%2?'#FF9A3C':'#ffffff'}); }
@@ -12953,7 +12956,10 @@ function collectLogo(L){
   beep(660,.09,'triangle',.2); setTimeout(()=>beep(880,.1,'sine',.15),60);
   updateHud();
 }
-function resetAndStart(){
+function resetAndStart(isRetry){
+  if (playHasStarted) { try { play.retry(); } catch (_) {} }
+  try { play.start(); } catch (_) {}
+  playHasStarted = true;
   document.getElementById('result').classList.remove('show');
   finished=false; phase='playing'; timeLeft=TUNING.GAME.timeLimit; score=0; collected=0; missed=0;
   logos=[];rings=[];parts=[];spawnT=0.3;cheerT=0;catMood='idle';cat.vy=0;
@@ -12964,6 +12970,7 @@ function resetAndStart(){
 }
 function showResult(){
   if(finished)return; finished=true; phase='finished';
+  try { play.end(); } catch (_) {}
   prog('GAME_END');
   document.getElementById('result-score').textContent=score+'てん';
   document.getElementById('result-sub').textContent='あつめたロゴ '+collected+'　にがした '+missed;
@@ -14510,7 +14517,7 @@ frame();
     out.push({ c: [cx, cy], r: Math.round(Math.max(24, Math.min(R, far + grid * 1.5)) * 10) / 10, n: cl[c].n });
   }
   return out;
-});};}catch(e){try{console.warn('[dc-place2d-spawn]',e&&e.message);}catch(_){}}})();</script><script data-dc-place2d-env>window.__dcPlace2dEnv=function(){var o={T:null,reset:null,toScreen:null,frame:null,roots:{}};try{o.T=typeof TUNING!=="undefined"?TUNING:null;}catch(_){}try{o.reset=typeof resetAndStart==="function"?resetAndStart:null;}catch(_){}try{o.toScreen=typeof toScreen==="function"?toScreen:null;}catch(_){}try{o.frame=typeof frame==="function"?frame:null;}catch(_){}return o;};window.__dcPlace2dLive=function(){var o={};try{o.canvas=typeof canvas!=="undefined"?canvas:null;}catch(_){}try{o.ctx=typeof ctx!=="undefined"?ctx:null;}catch(_){}try{o.dpr=typeof dpr!=="undefined"?dpr:null;}catch(_){}try{o.viewScale=typeof viewScale!=="undefined"?viewScale:null;}catch(_){}try{o.viewOx=typeof viewOx!=="undefined"?viewOx:null;}catch(_){}try{o.viewOy=typeof viewOy!=="undefined"?viewOy:null;}catch(_){}try{o.rng=typeof rng!=="undefined"?rng:null;}catch(_){}try{o.phase=typeof phase!=="undefined"?phase:null;}catch(_){}try{o.finished=typeof finished!=="undefined"?finished:null;}catch(_){}try{o.timeLeft=typeof timeLeft!=="undefined"?timeLeft:null;}catch(_){}try{o.score=typeof score!=="undefined"?score:null;}catch(_){}try{o.collected=typeof collected!=="undefined"?collected:null;}catch(_){}try{o.missed=typeof missed!=="undefined"?missed:null;}catch(_){}try{o.logos=typeof logos!=="undefined"?logos:null;}catch(_){}try{o.rings=typeof rings!=="undefined"?rings:null;}catch(_){}try{o.parts=typeof parts!=="undefined"?parts:null;}catch(_){}try{o.clouds=typeof clouds!=="undefined"?clouds:null;}catch(_){}try{o.spawnT=typeof spawnT!=="undefined"?spawnT:null;}catch(_){}try{o.animT=typeof animT!=="undefined"?animT:null;}catch(_){}try{o.lastTs=typeof lastTs!=="undefined"?lastTs:null;}catch(_){}try{o.cheerT=typeof cheerT!=="undefined"?cheerT:null;}catch(_){}try{o.catMood=typeof catMood!=="undefined"?catMood:null;}catch(_){}try{o.demoLogo=typeof demoLogo!=="undefined"?demoLogo:null;}catch(_){}try{o.demoT=typeof demoT!=="undefined"?demoT:null;}catch(_){}try{o.cat=typeof cat!=="undefined"?cat:null;}catch(_){}return o;};</script><script data-dc-place2d>(function(){try{(function dcPlace2d(w, cfg) {
+});};}catch(e){try{console.warn('[dc-place2d-spawn]',e&&e.message);}catch(_){}}})();</script><script data-dc-place2d-env>window.__dcPlace2dEnv=function(){var o={T:null,reset:null,toScreen:null,frame:null,roots:{}};try{o.T=typeof TUNING!=="undefined"?TUNING:null;}catch(_){}try{o.reset=typeof resetAndStart==="function"?resetAndStart:null;}catch(_){}try{o.toScreen=typeof toScreen==="function"?toScreen:null;}catch(_){}try{o.frame=typeof frame==="function"?frame:null;}catch(_){}return o;};window.__dcPlace2dLive=function(){var o={};try{o.play=typeof play!=="undefined"?play:null;}catch(_){}try{o.playHasStarted=typeof playHasStarted!=="undefined"?playHasStarted:null;}catch(_){}try{o.canvas=typeof canvas!=="undefined"?canvas:null;}catch(_){}try{o.ctx=typeof ctx!=="undefined"?ctx:null;}catch(_){}try{o.dpr=typeof dpr!=="undefined"?dpr:null;}catch(_){}try{o.viewScale=typeof viewScale!=="undefined"?viewScale:null;}catch(_){}try{o.viewOx=typeof viewOx!=="undefined"?viewOx:null;}catch(_){}try{o.viewOy=typeof viewOy!=="undefined"?viewOy:null;}catch(_){}try{o.rng=typeof rng!=="undefined"?rng:null;}catch(_){}try{o.phase=typeof phase!=="undefined"?phase:null;}catch(_){}try{o.finished=typeof finished!=="undefined"?finished:null;}catch(_){}try{o.timeLeft=typeof timeLeft!=="undefined"?timeLeft:null;}catch(_){}try{o.score=typeof score!=="undefined"?score:null;}catch(_){}try{o.collected=typeof collected!=="undefined"?collected:null;}catch(_){}try{o.missed=typeof missed!=="undefined"?missed:null;}catch(_){}try{o.logos=typeof logos!=="undefined"?logos:null;}catch(_){}try{o.rings=typeof rings!=="undefined"?rings:null;}catch(_){}try{o.parts=typeof parts!=="undefined"?parts:null;}catch(_){}try{o.clouds=typeof clouds!=="undefined"?clouds:null;}catch(_){}try{o.spawnT=typeof spawnT!=="undefined"?spawnT:null;}catch(_){}try{o.animT=typeof animT!=="undefined"?animT:null;}catch(_){}try{o.lastTs=typeof lastTs!=="undefined"?lastTs:null;}catch(_){}try{o.cheerT=typeof cheerT!=="undefined"?cheerT:null;}catch(_){}try{o.catMood=typeof catMood!=="undefined"?catMood:null;}catch(_){}try{o.demoLogo=typeof demoLogo!=="undefined"?demoLogo:null;}catch(_){}try{o.demoT=typeof demoT!=="undefined"?demoT:null;}catch(_){}try{o.cat=typeof cat!=="undefined"?cat:null;}catch(_){}return o;};</script><script data-dc-place2d>(function(){try{(function dcPlace2d(w, cfg) {
   // 表の物（cfg.items）か、組み直しで並ぶ配列（cfg.live・下の scanLive の WHY）か、あとから出てくる物（cfg.spawn・spawnMarks.js）があれば口を出す
   if (!w || !cfg || ((!cfg.items || !cfg.items.length) && !(cfg.live && cfg.live.length) && !(cfg.spawn && cfg.spawn.length))) return null;
   if (!cfg.items) cfg.items = [];
